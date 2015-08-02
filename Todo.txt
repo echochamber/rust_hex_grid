@@ -1,0 +1,3 @@
+* Make moving mouse over a grid cell highlight that cell (and unhighlight the cell that the mouse moved out of.
+* Make grid cells be able to contain a sprite.
+* Draw the border between grid cells.
