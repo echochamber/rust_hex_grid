@@ -1,45 +1,7 @@
 use board::*;
 use opengl_graphics::GlGraphics;
 use piston_window::*;
-
-pub struct Vec2f {
-	pub x: f64,
-	pub y: f64
-}
-
-pub struct ViewSettings {
-	pub window_size: Vec2f,
-	pub cell_size: f64,
-	pub font_size: u32,
-	pub text_offset: Vec2f,
-	pub grid_size: u8
-}
-
-impl ViewSettings {
-	pub fn new() -> ViewSettings {
-		ViewSettings {
-			window_size: Vec2f{ x: 1280.0, y: 720.0 },
-			cell_size: 25.0,
-			font_size: 64,
-			text_offset: Vec2f{ x: 30.0, y: 75.0 },
-			grid_size: 7
-		}
-	}
-}
-
-pub struct App {
-	settings: ViewSettings,
-	grid: HexGrid
-}
-
-impl App {
-	pub fn new(settings: ViewSettings) -> App {
-		App {
-			grid: HexGrid::new(settings.grid_size, settings.cell_size),
-			settings: settings
-		}
-	}
-}
+use app::*;
 
 impl Renderable for App {
 	fn render(&self, c: Context, g: &mut G2d) {
@@ -49,35 +11,68 @@ impl Renderable for App {
 
 impl Renderable for HexGrid {
 	fn render(&self, c: Context, g: &mut G2d) {
+
+		// Just some small amount so its all actually 
+		// inside the window while testing
 		let transform = c.transform.trans(200.0, 200.0);
 
 		for q in 0..self.grid_size {
 			for r in 0..self.grid_size {
+				// Amount to shift each odd row so the hexagons 
+				// form a grid without overlap or gaps.
 				let shift = (r % 2) as f64 * self.hex_size * 0.5 * 1.732058;
+
 				let x = q as f64 * (self.hex_size * 1.732058) + shift;
 				let y = r as f64 * self.hex_size * 1.5;
-				println!("{}", shift);
+				let hex_vertices = hex_vertices([0.0, 0.0], self.hex_size);
 				polygon(
-					[(r as f32 % 2.0), 1.0, 0.0, 1.0],
-					&hex_corners([0.0, 0.0], self.hex_size),
+					[0.25; 4],
+					&hex_vertices,
 					transform.trans(x, y),
 					g
 				);
+
+				// Draw the border around each hex, 6 lines
+				// Improve?
+				let vertex_iter = (&hex_vertices).iter().enumerate().peekable();
+				for (i, vertex) in vertex_iter {
+
+					// Assignment using destructuring is unstable for arrays?
+					let (x0, y0) = (vertex[0], vertex[1]);
+
+					let (x1, y1) = if i != 5 {
+						(hex_vertices[i + 1][0], hex_vertices[i + 1][1])
+					} else {
+						(hex_vertices[0][0], hex_vertices[0][1])
+					};
+
+					let line = Line::new([0.0, 0.0, 0.0, 0.5], 1.5);
+
+					Line::draw(
+						&line,
+						[x0, y0, x1, y1],
+						&c.draw_state,
+						transform.trans(x, y),
+						g
+					);
+				}
 			}
 		}
-	}	
+	}
 }
 
-fn hex_corners(center: [f64; 2], size: f64) -> [[f64; 2]; 6] {
-	let mut corners: [[f64; 2]; 6] = [[0.0; 2]; 6];
+// Get the vertex for the polygon
+fn hex_vertices(center: [f64; 2], size: f64) -> [[f64; 2]; 6] {
+	let mut vertices: [[f64; 2]; 6] = [[0.0; 2]; 6];
 	for i in 0..6usize {
-		corners[i] = hex_corner(center, size, i as u32);
+		vertices[i] = hex_vertex(center, size, i as u32);
 	}
 
-	corners
+	vertices
 }
 
-fn hex_corner(center: [f64; 2], size: f64, i: u32) -> [f64; 2] {
+// Get one of the vertexes of a hexagon ( 0 <= i < 6)
+fn hex_vertex(center: [f64; 2], size: f64, i: u32) -> [f64; 2] {
 	let angle_deg: f64 = 60.0 * i as f64 + 30.0;
 	let angle_rad: f64 = ::std::f64::consts::PI / 180.0 * angle_deg;
 	return [
@@ -86,6 +81,11 @@ fn hex_corner(center: [f64; 2], size: f64, i: u32) -> [f64; 2] {
 	];
 }
 
+// Maybe this should take an AppRenderContext struct (with information 
+// like if the hex is selected). Alternatively I could make a RenderInfo
+// trait that
+// since having the hex cells be a struct might be preferable once we
+// start rendering stuff in them. 
 pub trait Renderable {
 	fn render(&self, c: Context, g: &mut G2d);
 }

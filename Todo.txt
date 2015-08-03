@@ -1,3 +1,3 @@
 * Make moving mouse over a grid cell highlight that cell (and unhighlight the cell that the mouse moved out of.
 * Make grid cells be able to contain a sprite.
-* Draw the border between grid cells.
+* Make clicking a grid cell highlight that cell as selected (different shade from hover) and clicking it again unselects it. Clicking another cell moves the selected cell to the clicked cell.
