@@ -8,9 +8,10 @@ extern crate gfx_device_gl;
 extern crate piston;
 
 use opengl_graphics::OpenGL;
-use piston::event::{RenderEvent};
 use piston::window::WindowSettings;
 use piston_window::{PistonWindow, clear};
+use piston::input::Input;
+use piston::event::Event;
 
 use board::*;
 use view::*;
@@ -30,13 +31,32 @@ fn main() {
         .opengl(opengl)
         .into();
 
-    let app = App::new(ViewSettings::new());
+    let mut app = App::new(ViewSettings::new());
 
     for e in window {
-    	// Draw the grid
-    	e.draw_2d(|c, g| {
-    		clear([1.0, 1.0, 1.0, 1.0], g);
-    		app.render(c, g);
-    	});
+        match e.event {
+            Some(Event::Render(render_args)) => {
+                e.draw_2d(|c, g| {
+                    clear([1.0, 1.0, 1.0, 1.0], g);
+                    app.render(c, g);
+                });
+            },
+            Some(Event::Input(input)) => {
+                app.handle_input(&input);
+                println!("{:?}", input);
+            },
+            Some(Event::Idle(_)) => {
+                // Do nothing
+            },
+            Some(Event::Update(_)) => {
+                // Do nothing
+            },
+            Some(Event::AfterRender(_)) => {
+                // Do nothing
+            },
+            _ => { println!("{:?}", &e.event); }
+        }
 	}
 }
+
+pub type Point = [f64; 2];

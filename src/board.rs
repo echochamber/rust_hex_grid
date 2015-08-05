@@ -1,16 +1,17 @@
 use std::ops::{Add, Sub};
+use std::collections::HashMap;
 
 #[derive(Clone, Debug)]
 pub struct CubeCoord {
-	pub x: i32,
-	pub y: i32,
-	pub z: i32
+	pub x: i64,
+	pub y: i64,
+	pub z: i64
 }
 
-// Axial Coordinates
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct HexCoord {
-	pub q: i32,
-	pub r: i32
+	pub q: i64,
+	pub r: i64
 }
 
 impl Into<CubeCoord> for HexCoord {
@@ -157,5 +158,27 @@ impl HexGrid {
 			grid_size: size,
 			hex_size: hex_size
 		}
+	}
+
+	pub fn hex_centers(&self) -> HashMap<HexCoord, ::Point> {
+		let mut centers: HashMap<HexCoord, ::Point> = HashMap::new();
+		for q in 0..self.grid_size {
+			for r in 0..self.grid_size {
+				let shift = (r % 2) as f64 * self.hex_size * 0.5 * 1.732058;
+				centers.insert(
+					HexCoord { q: q as i64,  r: r as i64 },
+					[q as f64 * self.hex_width() + shift, r as f64 * self.hex_height() * 0.75]);
+			}
+		}
+
+		centers
+	}
+
+	pub fn hex_width(&self) -> f64 {
+		self.hex_size * 1.732058
+	}
+
+	pub fn hex_height(&self) -> f64 {
+		self.hex_size * 2.0
 	}
 }
