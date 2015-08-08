@@ -4,6 +4,7 @@ version = "0.1.0"
 dependencies = [
  "find_folder 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "gfx_device_gl 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "hex2d 0.0.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "piston 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "piston2d-graphics 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "piston2d-opengl_graphics 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -295,6 +296,16 @@ dependencies = [
  "wayland-kbd 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "winapi 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "x11-dl 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "hex2d"
+version = "0.0.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "num 0.1.25 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rand 0.3.9 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rustc-serialize 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
