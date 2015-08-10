@@ -2,14 +2,13 @@
 use hex2d::*;
 use piston_window::*;
 
-pub fn render_board(c: Context, g: &mut G2d, selected: Option<Coordinate>, grid_size: i32) {
+// Draw an entire grid of hexagons
+// grid size is the radius of hexagons surrounding the origin.
+pub fn render_board(c: Context, g: &mut G2d, selected: Option<Coordinate>, grid_size: i32, spacing: Spacing) {
 	let coord: Coordinate = Coordinate::new(12, 12);
 
 	
 	let origin = Coordinate::new(0, 0);
-	// let mut board: Vec<Position> = Vec::new();
-	// board.push(Position::new(origin, Direction::YZ));
-
 	let mut board: Vec<Coordinate> = Vec::new();
 	board.push(origin);
 	for i in 1..grid_size + 1 {
@@ -18,21 +17,27 @@ pub fn render_board(c: Context, g: &mut G2d, selected: Option<Coordinate>, grid_
 
 	for coordinate in board.iter() {
 		if selected.is_some() && coordinate.clone() == selected.unwrap() {
-			draw_hex(coordinate, 20.0, [0.75, 0.25, 0.5, 1.0], c.trans(200.0, 200.0), g);	
+			render_hex(coordinate, spacing, [0.75, 0.25, 0.5, 1.0], c.trans(200.0, 200.0), g);	
 		} else {
-			draw_hex(coordinate, 20.0, [0.25; 4], c.trans(200.0, 200.0), g);	
+			render_hex(coordinate, spacing, [0.25; 4], c.trans(200.0, 200.0), g);	
 		}
 		
 	}
 }
 
-// Todo make this work correctly for flat top
-pub fn draw_hex(coordinate: &Coordinate<i32>, size: f64, color: [f32; 4], c: Context, g: &mut G2d) {
+// Draw a single hexagon and its border.
+pub fn render_hex(coordinate: &Coordinate<i32>, spacing: Spacing, color: [f32; 4], c: Context, g: &mut G2d) {
+	let size = match spacing {
+		Spacing::PointyTop(size) => { size as f64 },
+		Spacing::FlatTop(size) => { size as f64 }
+	};
+
 	let width = size * 1.732058;
 	let height = size * 2.0;
 
-	let (x,y) = coordinate.to_pixel_float(Spacing::PointyTop(size as f32));
-	let hex_vertices = hex_vertices([0.0, 0.0], size);
+	// (x,y) are the pixel coordinates at the center of the hexagon being rendered
+	let (x,y) = coordinate.to_pixel_float(spacing);
+	let hex_vertices = hex_vertices([0.0, 0.0], spacing);
 	polygon(
 		color,
 		&hex_vertices,
@@ -67,26 +72,6 @@ pub fn draw_hex(coordinate: &Coordinate<i32>, size: f64, color: [f32; 4], c: Con
 	}
 }
 
-// Get the vertex for the polygon
-fn hex_vertices(center: [f64; 2], size: f64) -> [[f64; 2]; 6] {
-	let mut vertices: [[f64; 2]; 6] = [[0.0; 2]; 6];
-	for i in 0..6usize {
-		vertices[i] = hex_vertex(center, size, i as u32);
-	}
-
-	vertices
-}
-
-// Get one of the vertexes of a hexagon ( 0 <= i < 6)
-fn hex_vertex(center: [f64; 2], size: f64, i: u32) -> [f64; 2] {
-	let angle_deg: f64 = 60.0 * i as f64 + 30.0;
-	let angle_rad: f64 = ::std::f64::consts::PI / 180.0 * angle_deg;
-	return [
-		center[0] + size * angle_rad.cos(),
-		center[1] + size * angle_rad.sin()
-	];
-}
-
 /// Pixel coordinates tend to be in axial form, so this function 
 /// is likely more convenient than the one provided by hex2d-rust
 pub fn axial_pixel_to_hex(x: f32, y: f32, spacing: Spacing) -> Coordinate {
@@ -102,4 +87,36 @@ pub fn axial_pixel_to_hex(x: f32, y: f32, spacing: Spacing) -> Coordinate {
 			return Coordinate::from_round(q, -r -q);
 		}
 	}
+}
+
+// Get all the vertices for a hexagon
+fn hex_vertices(center: [f64; 2], spacing: Spacing) -> [[f64; 2]; 6] {
+	let mut vertices: [[f64; 2]; 6] = [[0.0; 2]; 6];
+	for i in 0..6usize {
+		vertices[i] = hex_vertex(center, spacing, i as u32);
+	}
+
+	vertices
+}
+
+// Get one of the vertexes of a hexagon ( 0 <= i < 6)
+fn hex_vertex(center: [f64; 2], spacing: Spacing, i: u32) -> [f64; 2] {
+	match spacing {
+		Spacing::PointyTop(size) => {
+			let angle_deg: f64 = 60.0 * i as f64 + 30.0;
+			let angle_rad: f64 = ::std::f64::consts::PI / 180.0 * angle_deg;
+			return [
+				center[0] + size as f64 * angle_rad.cos(),
+				center[1] + size as f64 * angle_rad.sin()
+			];
+		},
+		Spacing::FlatTop(size) => {
+			let angle_deg: f64 = 60.0 * i as f64;
+			let angle_rad: f64 = ::std::f64::consts::PI / 180.0 * angle_deg;
+			return [
+				center[0] + size as f64 * angle_rad.cos(),
+				center[1] + size as f64 * angle_rad.sin()
+			];
+		}
+	};
 }
