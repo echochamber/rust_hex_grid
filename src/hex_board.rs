@@ -72,8 +72,9 @@ pub fn render_hex(coordinate: &Coordinate<i32>, spacing: Spacing, color: [f32; 4
 	}
 }
 
+/// Remove this method and use from_pixel once PR is merged in hex2d-rs
 /// Pixel coordinates tend to be in axial form, so this function 
-/// is likely more convenient than the one provided by hex2d-rust
+/// is likely more convenient than the one provided by hex2d-rs
 pub fn axial_pixel_to_hex(x: f32, y: f32, spacing: Spacing) -> Coordinate {
 	match spacing {
 		Spacing::PointyTop(size) => {

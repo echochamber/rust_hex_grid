@@ -21,7 +21,7 @@ fn main() {
     // Variables for rendering 2d hex board. Could be put into a struct called HexBoardOptions I suppose.
     let grid_size = 4;
     let hex_size = 20.0;
-    let spacing = hex2d::Spacing::FlatTop(hex_size);
+    let spacing = hex2d::Spacing::PointyTop(hex_size);
 
     // Variables for the piston window
     let opengl = OpenGL::V3_2;
@@ -57,6 +57,7 @@ fn main() {
                 }
                 println!("clicked: {:?}", coord);
                 println!("selected: {:?}", selected);
+                println!("coordinates: {:?}", mouse_coords);
             }
             _ => {}
         }
