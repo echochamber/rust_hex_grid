@@ -6,4 +6,4 @@ Used [hex2d-rs](https://github.com/dpc/hex2d-rs)
 
 [Also, thanks to the guy who wrote this super useful article.](http://www.redblobgames.com/grids/hexagons/)
 
-![A hex grid with a border!](rust_hex_grid.png)
+![A hex grid with a border!](rust_hex_grid.gif)
