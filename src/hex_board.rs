@@ -5,8 +5,6 @@ use piston_window::*;
 // Draw an entire grid of hexagons
 // grid size is the radius of hexagons surrounding the origin.
 pub fn render_board(c: Context, g: &mut G2d, selected: Option<Coordinate>, grid_size: i32, spacing: Spacing) {
-	let coord: Coordinate = Coordinate::new(12, 12);
-
 	
 	let origin = Coordinate::new(0, 0);
 	let mut board: Vec<Coordinate> = Vec::new();
@@ -17,9 +15,9 @@ pub fn render_board(c: Context, g: &mut G2d, selected: Option<Coordinate>, grid_
 
 	for coordinate in board.iter() {
 		if selected.is_some() && coordinate.clone() == selected.unwrap() {
-			render_hex(coordinate, spacing, [0.75, 0.25, 0.5, 1.0], c.trans(200.0, 200.0), g);	
+			render_hex(coordinate, spacing, [0.75, 0.25, 0.5, 1.0], c, g);	
 		} else {
-			render_hex(coordinate, spacing, [0.25; 4], c.trans(200.0, 200.0), g);	
+			render_hex(coordinate, spacing, [0.25; 4], c, g);	
 		}
 		
 	}
@@ -37,11 +35,11 @@ pub fn render_hex(coordinate: &Coordinate<i32>, spacing: Spacing, color: [f32; 4
 
 	// (x,y) are the pixel coordinates at the center of the hexagon being rendered
 	let (x,y) = coordinate.to_pixel_float(spacing);
-	let hex_vertices = hex_vertices([0.0, 0.0], spacing);
+	let hex_vertices = hex_vertices([x as f64, y as f64], spacing);
 	polygon(
 		color,
 		&hex_vertices,
-		c.transform.trans(x as f64, y as f64),
+		c.transform,
 		g
 	);
 
@@ -50,14 +48,12 @@ pub fn render_hex(coordinate: &Coordinate<i32>, spacing: Spacing, color: [f32; 4
 	let vertex_iter = (&hex_vertices).iter().enumerate();
 	for (i, vertex) in vertex_iter {
 
+		let current = i % 6;
+		let next = (i + 1) % 6;
 		// Assignment using destructuring is unstable for arrays?
 		let (x0, y0) = (vertex[0], vertex[1]);
 
-		let (x1, y1) = if i != 5 {
-			(hex_vertices[i + 1][0], hex_vertices[i + 1][1])
-		} else {
-			(hex_vertices[0][0], hex_vertices[0][1])
-		};
+		let (x1, y1) = (hex_vertices[next][0], hex_vertices[next][1]);
 
 		let line = Line::new([0.0, 0.0, 0.0, 0.5], 0.5)
 			.shape(line::Shape::Round);
@@ -66,7 +62,7 @@ pub fn render_hex(coordinate: &Coordinate<i32>, spacing: Spacing, color: [f32; 4
 			&line,
 			[x0, y0, x1, y1],
 			&c.draw_state,
-			c.transform.trans(x as f64, y as f64),
+			c.transform,
 			g
 		);
 	}

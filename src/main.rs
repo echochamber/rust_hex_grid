@@ -5,13 +5,8 @@ extern crate opengl_graphics;
 extern crate piston;
 extern crate hex2d;
 
-use opengl_graphics::OpenGL;
-use piston::window::WindowSettings;
-use piston_window::{PistonWindow, clear};
-use piston::input::{Input, Motion, Button};
-use piston::event::Event;
-
 use hex_board::*;
+use piston_window::*;
 
 mod hex_board;
 
@@ -42,7 +37,7 @@ fn main() {
             Some(Event::Render(render_args)) => {
                 e.draw_2d(|c, g| {
                     clear([1.0, 1.0, 1.0, 1.0], g);
-                    render_board(c, g, selected, grid_size, spacing);
+                    render_board(c.trans(200.0, 200.0), g, selected, grid_size, spacing);
                 });
             },
             Some(Event::Input(Input::Move(Motion::MouseCursor(x, y)))) => {
