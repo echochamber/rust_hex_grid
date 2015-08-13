@@ -162,12 +162,6 @@ enum PixelHexState {
 	Default
 }
 
-pub struct TriangleHex {
-	pub c: Coordinate<i32>,
-	pub filled_triangle: i32,
-	pub spacing: Spacing,
-}
-
 pub fn render_triangle_hex(center: Point, spacing: Spacing, i: i32, color: [f32; 4], c: Context, g: &mut G2d) {
 
 	let triangle =  hex_triangle(center, spacing, i);
