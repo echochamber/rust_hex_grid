@@ -2,25 +2,6 @@
 use hex2d::*;
 use piston_window::*;
 
-// Draw an entire grid of hexagons
-// grid size is the radius of hexagons surrounding the origin.
-pub fn render_board(selected: Option<Coordinate>, grid_size: i32, spacing: Spacing, c: Context, g: &mut G2d) {
-	let origin = Coordinate::new(0, 0);
-	let mut board: Vec<Coordinate> = Vec::new();
-	board.push(origin);
-	for i in 1..grid_size + 1 {
-		board.append(&mut origin.ring(i, Spin::CCW(XY)));
-	}
-
-	for coordinate in board.iter() {
-		if selected.is_some() && coordinate.clone() == selected.unwrap() {
-			render_hex(coordinate, spacing, [0.75, 0.25, 0.5, 1.0], c, g);	
-		} else {
-			render_hex(coordinate, spacing, [0.25; 4], c, g);
-		}
-	}
-}
-
 pub type Point =  [f64; 2];
 pub type Triangle = [Point; 3];
 pub type Hexagon = [Point; 6];
@@ -150,7 +131,12 @@ fn render_pixel_hex(hex: &PixelHex, c: Context, g: &mut G2d) {
 
 	match hex.filled_triangle {
 		Some(i) => {
-			render_triangle_hex(hex.center, hex.spacing, i, [0.4, 0.4, 0.8, 1.0], c, g);
+			
+			let greenness: f32;
+			let redness: f32;
+			let current = i % 6;
+			redness = (current as f32 / 5.0) * 0.75 + 0.25;
+			render_triangle_hex(hex.center, hex.spacing, i, [redness, 0.0, 0.0, 1.0], c, g);
 		},
 		None => {}
 	};

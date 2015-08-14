@@ -36,9 +36,9 @@ impl Game {
 	            self.mouse_coords = (x as f32, y as f32);
 	        },
 	        Input::Press(Button::Mouse(_)) => {
-	            let coord = axial_pixel_to_hex(self.mouse_coords.0 - self.offset as f32, self.mouse_coords.0 - self.offset as f32, Spacing::PointyTop(self.options.hex_size));
+	            let coord = axial_pixel_to_hex(self.mouse_coords.0 - self.offset as f32, self.mouse_coords.1 - self.offset as f32, Spacing::PointyTop(self.options.hex_size));
 	            self.board.select(coord);
-	            println!("clicked: {:?}", coord);
+	            println!("triangled: {:?}", coord);
 	            println!("coordinates: {:?}", self.mouse_coords);
 	        },
 	        Input::Press(Button::Keyboard(key)) => {
@@ -63,8 +63,10 @@ impl Game {
 	                    if (triangle_op.is_some()) {
 	                        self.board.set_triangle(coord, None);
 	                    } else {
-	                        self.board.set_triangle(coord, Some(3));
+	                        self.board.set_triangle(coord, Some(0));
 	                    }
+	                    println!("triangled: {:?}", coord);
+	            		println!("coordinates: {:?}", self.mouse_coords);
 	                    
 	                }
 	                _ => {}
